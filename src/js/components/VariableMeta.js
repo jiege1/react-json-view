@@ -23,7 +23,7 @@ export default class extends React.PureComponent {
     };
 
     getAddAttribute = rowHovered => {
-        const { theme, namespace, name, src, rjvId, depth } = this.props;
+        const { theme, namespace, name, src, rjvId, depth, onAddClick } = this.props;
 
         return (
             <span
@@ -47,22 +47,27 @@ export default class extends React.PureComponent {
                             variable_removed: false,
                             key_name: null
                         };
-                        if (toType(src) === 'object') {
-                            dispatcher.dispatch({
-                                name: 'ADD_VARIABLE_KEY_REQUEST',
-                                rjvId: rjvId,
-                                data: request
-                            });
+                        if (onAddClick) {
+                            onAddClick(request)
                         } else {
-                            dispatcher.dispatch({
-                                name: 'VARIABLE_ADDED',
-                                rjvId: rjvId,
-                                data: {
-                                    ...request,
-                                    new_value: [...src, null]
-                                }
-                            });
+                            if (toType(src) === 'object') {
+                                dispatcher.dispatch({
+                                    name: 'ADD_VARIABLE_KEY_REQUEST',
+                                    rjvId: rjvId,
+                                    data: request
+                                });
+                            } else {
+                                dispatcher.dispatch({
+                                    name: 'VARIABLE_ADDED',
+                                    rjvId: rjvId,
+                                    data: {
+                                        ...request,
+                                        new_value: [...src, null]
+                                    }
+                                });
+                            }
                         }
+
                     }}
                 />
             </span>
@@ -70,7 +75,7 @@ export default class extends React.PureComponent {
     };
 
     getRemoveObject = rowHovered => {
-        const { theme, hover, namespace, name, src, rjvId } = this.props;
+        const { theme, hover, namespace, name, src, rjvId, onRemoveClick } = this.props;
 
         //don't allow deleting of root node
         if (namespace.length === 1) {
@@ -87,19 +92,30 @@ export default class extends React.PureComponent {
                     class="click-to-remove-icon"
                     {...Theme(theme, 'removeVarIcon')}
                     onClick={() => {
-                        dispatcher.dispatch({
-                            name: 'VARIABLE_REMOVED',
-                            rjvId: rjvId,
-                            data: {
+                        if (onRemoveClick) {
+                            onRemoveClick({
                                 name: name,
                                 namespace: namespace.splice(
-                                    0,
-                                    namespace.length - 1
+                                  0,
+                                  namespace.length - 1
                                 ),
                                 existing_value: src,
-                                variable_removed: true
-                            }
-                        });
+                            });
+                        } else {
+                            dispatcher.dispatch({
+                                name: 'VARIABLE_REMOVED',
+                                rjvId: rjvId,
+                                data: {
+                                    name: name,
+                                    namespace: namespace.splice(
+                                      0,
+                                      namespace.length - 1
+                                    ),
+                                    existing_value: src,
+                                    variable_removed: true
+                                }
+                            });
+                        }
                     }}
                 />
             </span>

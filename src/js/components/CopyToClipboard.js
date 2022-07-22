@@ -29,9 +29,26 @@ export default class extends React.PureComponent {
         const container = document.createElement('textarea');
         const { clickCallback, src, namespace } = this.props;
 
+        console.log(this.clipboardValue(src))
+        console.log(JSON.stringify(
+          this.clipboardValue(src),
+          (k, v) => {
+              if (typeof v === 'bigint') {
+                  return v.toString();
+              }
+              return v;
+          },
+          '  '
+        ))
+
         container.innerHTML = JSON.stringify(
             this.clipboardValue(src),
-            null,
+            (k, v) => {
+                if (typeof v === 'bigint') {
+                    return v.toString();
+                }
+                return v;
+            },
             '  '
         );
 

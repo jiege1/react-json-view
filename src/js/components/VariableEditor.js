@@ -14,6 +14,7 @@ import {
     JsonFloat,
     JsonFunction,
     JsonInteger,
+    JsonBigInteger,
     JsonNan,
     JsonNull,
     JsonRegexp,
@@ -170,8 +171,15 @@ class VariableEditor extends React.PureComponent {
         );
     };
 
-    prepopInput = variable => {
-        if (this.props.onEdit !== false) {
+    prepopInput = () => {
+      const { variable, namespace, onEditClick } = this.props;
+      if (onEditClick) {
+        onEditClick({
+          name: variable.name,
+          namespace: namespace,
+          existing_value: variable.value,
+        })
+      } else if (this.props.onEdit !== false) {
             const stringifiedValue = stringifyVariable(variable.value);
             const detected = parseInput(stringifiedValue);
             this.setState({
@@ -186,7 +194,7 @@ class VariableEditor extends React.PureComponent {
     };
 
     getRemoveIcon = () => {
-        const { variable, namespace, theme, rjvId } = this.props;
+        const { variable, namespace, theme, rjvId, onRemoveClick } = this.props;
 
         return (
             <div
@@ -200,16 +208,25 @@ class VariableEditor extends React.PureComponent {
                     class="click-to-remove-icon"
                     {...Theme(theme, 'removeVarIcon')}
                     onClick={() => {
-                        dispatcher.dispatch({
+                        if (onRemoveClick) {
+                          onRemoveClick({
+                            name: variable.name,
+                            namespace: namespace,
+                            existing_value: variable.value,
+                            variable_removed: true
+                          });
+                        } else {
+                          dispatcher.dispatch({
                             name: 'VARIABLE_REMOVED',
                             rjvId: rjvId,
                             data: {
-                                name: variable.name,
-                                namespace: namespace,
-                                existing_value: variable.value,
-                                variable_removed: true
+                              name: variable.name,
+                              namespace: namespace,
+                              existing_value: variable.value,
+                              variable_removed: true
                             }
-                        });
+                          });
+                        }
                     }}
                 />
             </div>
@@ -226,6 +243,8 @@ class VariableEditor extends React.PureComponent {
                 return <JsonString value={variable.value} {...props} />;
             case 'integer':
                 return <JsonInteger value={variable.value} {...props} />;
+            case 'bigint':
+                return <JsonBigInteger value={variable.value} {...props} />;
             case 'float':
                 return <JsonFloat value={variable.value} {...props} />;
             case 'boolean':
