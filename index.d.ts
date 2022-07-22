@@ -1,4 +1,12 @@
+/* eslint-disable */
+
 import * as React from 'react';
+
+export interface ActionProps {
+  existing_value: object;
+  name: string;
+  namespace: string[];
+}
 
 export interface ReactJsonViewProps {
   /**
@@ -101,6 +109,7 @@ export interface ReactJsonViewProps {
    * Default: false
    */
   onEdit?: ((edit: InteractionProps) => false | any) | false;
+  onEditClick?: (value: ActionProps) => void;
   /**
    * When a callback function is passed in, add functionality is enabled.
    * The callback is invoked before additions are completed.
@@ -109,6 +118,7 @@ export interface ReactJsonViewProps {
    * Default: false
    */
   onAdd?: ((add: InteractionProps) => false | any) | false;
+  onAddClick?: (value: ActionProps) => void;
   /**
    * When a callback function is passed in, delete functionality is enabled.
    * The callback is invoked before deletions are completed.
@@ -117,6 +127,7 @@ export interface ReactJsonViewProps {
    * Default: false
    */
   onDelete?: ((del: InteractionProps) => false | any) | false;
+  onRemoveClick?: (value: ActionProps) => void;
   /**
    * When a function is passed in, clicking a value triggers the onSelect method to be called.
    *
@@ -222,7 +233,6 @@ export interface OnSelectProps {
    * List of keys representing the scopes above the selected entry.
    */
   namespace: Array<string | null>;
-
 }
 
 export type TypeDefaultValue = string | number | boolean | object;
